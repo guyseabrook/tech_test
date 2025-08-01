@@ -1,15 +1,52 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { XorO } from "./types";
 import GameBoard from "./components/GameBoard";
 import Player from "./components/Player";
+import GameOver from "./components/GameOver";
 
 export const Main = () => {
   const [activePlayer, setActivePlayer] = useState<XorO>("X"); // Starting with player "X"
+  const [winner, setWinner] = useState<XorO | undefined>(undefined);
+  const [isDraw, setIsDraw] = useState(false);
   const [board, setBoard] = useState<(XorO | undefined)[][]>([
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
   ]);
+
+  const checkWinner = (board: (XorO | undefined)[][]): XorO | undefined => {
+    for (let i = 0; i < 3; i++) {
+      if (
+        board[i][0] &&
+        board[i][0] === board[i][1] &&
+        board[i][0] === board[i][2]
+      ) {
+        return board[i][0];
+      }
+      if (
+        board[0][i] &&
+        board[0][i] === board[1][i] &&
+        board[0][i] === board[2][i]
+      ) {
+        return board[0][i];
+      }
+    }
+    if (
+      board[0][0] &&
+      board[0][0] === board[1][1] &&
+      board[0][0] === board[2][2]
+    ) {
+      return board[0][0];
+    }
+    if (
+      board[0][2] &&
+      board[0][2] === board[1][1] &&
+      board[0][2] === board[2][0]
+    ) {
+      return board[0][2];
+    }
+    return undefined;
+  };
 
   const onSelectSquare = ({ rowIndex, colIndex }) => {
     setBoard((prevBoard) => {
@@ -18,11 +55,31 @@ export const Main = () => {
           rIdx === rowIndex && cIdx === colIndex ? activePlayer : cell,
         ),
       );
+
+      const foundWinner = checkWinner(newBoard);
+      const isFull = newBoard.flat().every((cell) => cell !== undefined);
+
+      if (foundWinner) {
+        setWinner(foundWinner);
+      } else if (isFull) {
+        setIsDraw(true);
+      } else {
+        setActivePlayer((prev) => (prev === "X" ? "O" : "X"));
+      }
+
       return newBoard;
     });
-
-    setActivePlayer((prev) => (prev === "X" ? "O" : "X"));
   };
+
+  function handleResetGame() {
+    setBoard([
+      [undefined, undefined, undefined],
+      [undefined, undefined, undefined],
+      [undefined, undefined, undefined],
+    ]);
+    setWinner(undefined);
+    setIsDraw(false);
+  }
 
   return (
     <>
@@ -40,6 +97,9 @@ export const Main = () => {
           <Player name="Player 1" symbol="X" isActive={activePlayer === "X"} />
           <Player name="Player 2" symbol="O" isActive={activePlayer === "O"} />
         </div>
+        {(winner || isDraw) && (
+          <GameOver winner={winner} resetGame={handleResetGame} />
+        )}
         <GameBoard board={board} onSelectSquare={onSelectSquare} />
       </div>
     </>

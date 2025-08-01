@@ -20,8 +20,9 @@ export default function GameBoard({
         row.map((cell, colIndex) => (
           <button
             key={`${rowIndex}-${colIndex}`}
-            className="flex h-40 w-40 items-center justify-center rounded-md border border-gray-300 text-7xl text-white hover:border-gray-50"
+            className="h-40 w-40 items-center justify-center rounded-md border border-gray-300 text-7xl text-white hover:border-gray-50"
             onClick={() => onSelectSquare({ rowIndex, colIndex })}
+            disabled={!!cell}
           >
             {cell}
           </button>
