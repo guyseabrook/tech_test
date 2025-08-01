@@ -1,22 +1,47 @@
-import React, { useState } from 'react'
-import { XorO } from './types'
-
+import React, { useState } from "react";
+import { XorO } from "./types";
+import GameBoard from "./components/GameBoard";
+import Player from "./components/Player";
 
 export const Main = () => {
+  const [activePlayer, setActivePlayer] = useState<XorO>("X"); // Starting with player "X"
   const [board, setBoard] = useState<(XorO | undefined)[][]>([
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
-    [undefined, undefined, undefined]
-  ])
+    [undefined, undefined, undefined],
+  ]);
 
-  return <div className='flex flex-col mt-10 items-center gap-10'>
-    <div className='font-bold text-2xl'>Tic Tac Toe</div>
-    <div className='flex flex-col gap-1'>
-      {board.map(row => <div className='flex gap-1'>
-        {row.map(column => <div className='border-2 border-gray-900 w-10 h-10 cursor-pointer items-center justify-center text-2xl font-bold flex'>
-          {column}
-        </div>)}
-      </div>)}
-    </div>
-  </div>
-}
+  const onSelectSquare = ({ rowIndex, colIndex }) => {
+    setBoard((prevBoard) => {
+      const newBoard = prevBoard.map((row, rIdx) =>
+        row.map((cell, cIdx) =>
+          rIdx === rowIndex && cIdx === colIndex ? activePlayer : cell,
+        ),
+      );
+      return newBoard;
+    });
+
+    setActivePlayer((prev) => (prev === "X" ? "O" : "X"));
+  };
+
+  return (
+    <>
+      <header
+        id="title"
+        className="bg-spruceGreen w-screen border-b border-white/10 pb-5 pl-16 pr-16 pt-5 text-center text-2xl font-bold text-white"
+      >
+        Tic Tac Toe
+      </header>
+      <div
+        id="game-container"
+        className="bg-spruceGreen flex flex-col items-center gap-10 p-10"
+      >
+        <div id="players" className="flex gap-10">
+          <Player name="Player 1" symbol="X" isActive={activePlayer === "X"} />
+          <Player name="Player 2" symbol="O" isActive={activePlayer === "O"} />
+        </div>
+        <GameBoard board={board} onSelectSquare={onSelectSquare} />
+      </div>
+    </>
+  );
+};
