@@ -3,9 +3,11 @@ import { XorO } from "../types";
 
 export default function GameBoard({
   board,
+  boardSize = 3,
   onSelectSquare,
 }: {
   board: (XorO | undefined)[][];
+  boardSize: number;
   onSelectSquare: ({
     rowIndex,
     colIndex,
@@ -15,7 +17,13 @@ export default function GameBoard({
   }) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div
+      className={"grid gap-2"}
+      style={{
+        gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${boardSize}, minmax(0, 1fr))`,
+      }}
+    >
       {board.map((row, rowIndex) =>
         row.map((cell, colIndex) => (
           <button
